@@ -37,6 +37,13 @@ public class PaymentChecker {
         subscriptions.forEach(subscription -> {
             final AccountId accountId = subscription.getAccountId();
             final SubscriptionType subscriptionType = subscription.getType();
+            if (accountId.isFrozen()){
+                subscriptionService.interrupt(
+                        new UnsubscriptionRequestDto(subscriptionType.getName()),
+                        accountId
+                );
+                return;
+            }
             final BankDetails bankDetails = subscription.getBankDetails();
             final int amount = subscriptionType.getPrice();
             try {

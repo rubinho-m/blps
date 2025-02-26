@@ -20,4 +20,6 @@ public interface SubscriptionService {
     SubscriptionResponseDto subscribe(SubscriptionRequestDto subscriptionRequestDto, AccountId accountId);
 
     void unsubscribe(UnsubscriptionRequestDto unsubscriptionRequestDto, AccountId accountId);
+
+    void interrupt(UnsubscriptionRequestDto unsubscriptionRequestDto, AccountId accountId);
 }

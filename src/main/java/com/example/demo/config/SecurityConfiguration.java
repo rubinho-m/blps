@@ -59,6 +59,7 @@ public class SecurityConfiguration {
 
                         .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/profiles/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/profiles/{id}").authenticated()
 
                         .requestMatchers("/subscriptions/**").authenticated()
 
@@ -69,7 +70,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/news/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/news/**").authenticated()
 
-                        .requestMatchers("/accounts").authenticated()
+                        .requestMatchers("/accounts/**").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/languages").permitAll()
                         .requestMatchers(HttpMethod.GET, "/towns").permitAll()

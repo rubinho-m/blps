@@ -94,16 +94,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void unsubscribe(UnsubscriptionRequestDto unsubscriptionRequestDto, AccountId accountId) {
-        final SubscriptionType subscriptionType = subscriptionTypeRepository.findByName(
-                        unsubscriptionRequestDto.getSubscriptionName()
-                )
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription type not found")
-                );
-        final Optional<Subscription> subscriptionOpt = subscriptionRepository.findByTypeAndAccountId(
-                subscriptionType,
-                accountId
-        );
+        final Optional<Subscription> subscriptionOpt =getSubscripton(unsubscriptionRequestDto, accountId);
         if (subscriptionOpt.isEmpty()) {
             return;
         }
@@ -111,6 +102,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         final LocalDate nextPaymentDate = subscription.getNextPaymentDate();
         subscription.setNextPaymentDate(null);
         subscription.setEndDate(nextPaymentDate);
+        subscriptionRepository.save(subscription);
+    }
+
+    @Override
+    public void interrupt(UnsubscriptionRequestDto unsubscriptionRequestDto, AccountId accountId) {
+        final Optional<Subscription> subscriptionOpt =getSubscripton(unsubscriptionRequestDto, accountId);
+        if (subscriptionOpt.isEmpty()) {
+            return;
+        }
+        final Subscription subscription = subscriptionOpt.get();
+        subscription.setNextPaymentDate(null);
+        subscription.setEndDate(LocalDate.now());
         subscriptionRepository.save(subscription);
     }
 
@@ -127,5 +130,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setBankDetails(bankDetails);
         bankDetailsService.makePayment(accountId, bankDetails, subscription.getType().getPrice());
         return subscriptionMapper.toDto(subscriptionRepository.save(subscription));
+    }
+
+    private Optional<Subscription> getSubscripton(UnsubscriptionRequestDto unsubscriptionRequestDto, AccountId accountId) {
+        final SubscriptionType subscriptionType = subscriptionTypeRepository.findByName(
+                        unsubscriptionRequestDto.getSubscriptionName()
+                )
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription type not found")
+                );
+        return subscriptionRepository.findByTypeAndAccountId(
+                subscriptionType,
+                accountId
+        );
     }
 }
