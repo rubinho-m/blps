@@ -69,7 +69,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/news/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/news/**").authenticated()
 
-                        .requestMatchers("/account").authenticated()
+                        .requestMatchers("/accounts").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/languages").permitAll()
                         .requestMatchers(HttpMethod.GET, "/towns").permitAll()

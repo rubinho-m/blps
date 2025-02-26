@@ -19,4 +19,6 @@ public interface AccountIdService {
     void permitChangeRequest(Long id);
 
     void denyChangeRequest(Long id);
+
+    void block(Long id, String token);
 }

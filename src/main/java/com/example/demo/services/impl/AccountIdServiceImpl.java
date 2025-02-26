@@ -8,6 +8,7 @@ import com.example.demo.mappers.AccountIdChangeRequestMapper;
 import com.example.demo.mappers.AccountIdMapper;
 import com.example.demo.model.AccountId;
 import com.example.demo.model.AccountIdChangeRequest;
+import com.example.demo.model.Role;
 import com.example.demo.repository.AccountIdChangeRequestRepository;
 import com.example.demo.repository.AccountIdRepository;
 import com.example.demo.services.AccountIdService;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -84,5 +86,16 @@ public class AccountIdServiceImpl implements AccountIdService {
         final AccountIdChangeRequest changeRequest = accountIdChangeRequestRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         accountIdChangeRequestRepository.delete(changeRequest);
+    }
+
+    @Override
+    public void block(Long id, String token) {
+        final AccountId accountIdToBlock = accountIdRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        final AccountId accountId = getAccountIdByToken(token);
+        if (accountId.equals(accountIdToBlock) || Role.ADMIN.equals(accountId.getRole())) {
+            accountIdToBlock.setFrozen(true);
+            accountIdRepository.save(accountId);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.example.demo.services.impl;
 
-import com.example.demo.dto.ProfileRequestDto;
+import  com.example.demo.dto.ProfileRequestDto;
 import com.example.demo.dto.ProfileResponseDto;
 import com.example.demo.mappers.ProfileMapper;
 import com.example.demo.model.AccountId;
@@ -34,16 +34,19 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileResponseDto getProfileByLogin(String login) {
-        return profileMapper.toDto(
-                profileRepository.findByLogin(login)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-        );
+        final Profile profile = profileRepository.findByLogin(login)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (profile.isFrozen()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This profile is frozen");
+        }
+        return profileMapper.toDto(profile);
     }
 
     @Override
     public List<ProfileResponseDto> getAllProfiles() {
         return profileRepository.findAll()
                 .stream()
+                .filter(profile -> !profile.isFrozen())
                 .map(profileMapper::toDto)
                 .toList();
     }
@@ -67,5 +70,15 @@ public class ProfileServiceImpl implements ProfileService {
             return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+
+    @Override
+    public void block(Long id, AccountId accountId) {
+        final Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (accountId.equals(profile.getAccountId()) || Role.ADMIN.equals(accountId.getRole())){
+            profile.setFrozen(true);
+            profileRepository.save(profile);
+        }
     }
 }

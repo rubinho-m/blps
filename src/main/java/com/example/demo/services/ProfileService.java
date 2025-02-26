@@ -12,4 +12,6 @@ public interface ProfileService {
     List<ProfileResponseDto> getAllProfiles();
 
     void edit(Long id, ProfileRequestDto profileRequestDto, AccountId accountId);
+
+    void block(Long id, AccountId accountId);
 }

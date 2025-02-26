@@ -41,4 +41,10 @@ public class ProfileApiImpl implements ProfileApi {
         profileService.edit(id, profileRequestDto, accountId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
+
+    @Override
+    public ResponseEntity<Void> block(Long id, String token) {
+        profileService.block(id, accountIdService.getAccountIdByToken(token));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
 }

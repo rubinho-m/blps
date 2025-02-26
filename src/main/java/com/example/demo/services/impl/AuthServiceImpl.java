@@ -46,8 +46,10 @@ public class AuthServiceImpl implements AuthService {
         }
         final AccountId accountId = accountIdMapper.toEntity(registerDto);
         final Profile createdProfile = new Profile();
+        createdProfile.setFrozen(false);
         createdProfile.setLogin(registerDto.getLogin());
         accountId.setProfile(createdProfile);
+        accountId.setFrozen(false);
         profileRepository.save(createdProfile);
         accountIdRepository.save(accountId);
         return new RegisteredAccountIdDto(userAuthProvider.createToken(accountId.getLogin(), accountId.getRole()));
@@ -59,9 +61,20 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
         if (passwordEncoder.matches(CharBuffer.wrap(loginDto.getPassword()), accountId.getPassword())) {
+            checkFrozen(accountId);
             return new RegisteredAccountIdDto(userAuthProvider.createToken(accountId.getLogin(), accountId.getRole()));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+    }
+
+    private void checkFrozen(AccountId accountId) {
+        if (accountId.isFrozen() || accountId.getProfile().isFrozen()) {
+            final Profile profile = accountId.getProfile();
+            profile.setFrozen(false);
+            accountId.setFrozen(false);
+            accountId.setProfile(profileRepository.save(profile));
+            accountIdRepository.save(accountId);
+        }
     }
 }

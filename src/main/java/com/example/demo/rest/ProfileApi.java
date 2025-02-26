@@ -4,6 +4,7 @@ import com.example.demo.dto.ProfileRequestDto;
 import com.example.demo.dto.ProfileResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,4 +25,8 @@ public interface ProfileApi {
     ResponseEntity<Void> edit(@PathVariable("id") Long id,
                               @RequestBody ProfileRequestDto profileRequestDto,
                               @RequestHeader("Authorization") String token);
+
+    @DeleteMapping("/profiles/{id}")
+    ResponseEntity<Void> block(@PathVariable("id") Long id,
+                               @RequestHeader("Authorization") String token);
 }

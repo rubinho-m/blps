@@ -55,8 +55,11 @@ public class AccountId {
     @Column(nullable = false)
     private Role role;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     private Profile profile;
+
+    @Column
+    private boolean frozen;
 
     @OneToMany(mappedBy = "accountId", cascade = CascadeType.REMOVE)
     private List<Subscription> subscriptions;

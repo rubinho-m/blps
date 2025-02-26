@@ -28,4 +28,10 @@ public class AccountIdApiImpl implements AccountIdApi {
         accountIdService.requestChangeAccountId(token, accountIdChangeRequestDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Запрос на изменение данных аккаунта отправлен");
     }
+
+    @Override
+    public ResponseEntity<Void> block(Long id, String token) {
+        accountIdService.block(id, token);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
 }

@@ -146,7 +146,7 @@ curl --location "http://localhost:${PORT}/profiles/user" | jq .
 echo ''
 
 echo 'Получим список языков'
-curl --location 'http://localhost:${PORT}/languages' | jq .
+curl --location "http://localhost:${PORT}/languages" | jq .
 echo ''
 
 echo 'Установим информацию о профиле и добавим пользователя admin в семью'
@@ -168,18 +168,18 @@ curl --location "http://localhost:${PORT}/profiles" | jq .
 echo ''
 
 echo 'Посмотрим персональные данные пользователя'
-curl --location "http://localhost:${PORT}/account" \
+curl --location "http://localhost:${PORT}/accounts" \
 --header "Authorization: Bearer ${USER_TOKEN}" | jq .
 echo ''
 
 echo 'Отправим запрос на изменение имени'
-curl --location --request PUT "http://localhost:${PORT}/account" \
+curl --location --request PUT "http://localhost:${PORT}/accounts" \
 --header 'Content-Type: application/json' \
 --header "Authorization: Bearer ${USER_TOKEN}" \
 --data '{
     "name": "newName",
     "surname": "surname"
-}' | jq
+}'
 echo ''
 
 echo 'Админом получим все запросы на изменение персональных данных'
@@ -197,5 +197,5 @@ curl --location "http://localhost:${PORT}/profiles/user" | jq .
 echo ''
 
 echo 'Посмотрим персональные данные пользователя'
-curl --location "http://localhost:${PORT}/account" \
+curl --location "http://localhost:${PORT}/accounts" \
 --header "Authorization: Bearer ${USER_TOKEN}" | jq
