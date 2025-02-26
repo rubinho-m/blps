@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: shishki
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    defaultModelsExpandDepth: -1
+    tags-sorter: alpha
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
