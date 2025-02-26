@@ -1,6 +1,8 @@
+server:
+  port: 6128
 spring:
   application:
-    name: shishki
+    name: blps_1
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres

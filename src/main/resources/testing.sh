@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PORT=8080
+PORT=6128
 
 echo 'Зарегистрируем пользователя'
 RESPONSE=$(curl --location "http://localhost:${PORT}/register" \
@@ -118,7 +118,7 @@ curl --location "http://localhost:${PORT}/subscriptions/subscribe" \
 echo ''
 
 echo 'Просмотрим активные подписки аккаунта'
-curl --location "http://localhost:8080/subscriptions" \
+curl --location "http://localhost:${PORT}/subscriptions" \
 --header "Authorization: Bearer ${USER_TOKEN}" | jq .
 echo ''
 
@@ -146,7 +146,7 @@ curl --location "http://localhost:${PORT}/profiles/user" | jq .
 echo ''
 
 echo 'Получим список языков'
-curl --location 'http://localhost:8080/languages' | jq .
+curl --location 'http://localhost:${PORT}/languages' | jq .
 echo ''
 
 echo 'Установим информацию о профиле и добавим пользователя admin в семью'
