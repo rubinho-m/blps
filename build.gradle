@@ -8,6 +8,13 @@ plugins {
 group = 'com.rubinho'
 version = '0.0.1-SNAPSHOT'
 
+war {
+    archiveFileName = 'ROOT.war'
+    destinationDirectory = project.hasProperty('outputDir')
+            ? file(project.outputDir)
+            : file("$buildDir/libs")
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -36,6 +43,8 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'com.auth0:java-jwt:4.4.0'
+    implementation "com.stripe:stripe-java:29.0.0"
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.4")
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

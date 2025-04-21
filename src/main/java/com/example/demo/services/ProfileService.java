@@ -9,7 +9,7 @@ import java.util.List;
 public interface ProfileService {
     ProfileResponseDto getProfileByLogin(String login);
 
-    List<ProfileResponseDto> getAllProfiles();
+    List<ProfileResponseDto> getAllProfiles(int page, int pageSize);
 
     void edit(Long id, ProfileRequestDto profileRequestDto, AccountId accountId);
 

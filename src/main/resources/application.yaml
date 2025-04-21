@@ -4,9 +4,7 @@ spring:
   application:
     name: blps_1
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
+    jndi-name: "java:jboss/datasources/blps"
   sql:
     init:
       mode: always
@@ -25,3 +23,6 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /api-docs
+logging:
+  level:
+    root: info

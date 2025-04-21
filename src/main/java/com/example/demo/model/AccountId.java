@@ -36,9 +36,6 @@ public class AccountId {
     private String login;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -50,10 +47,6 @@ public class AccountId {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Sex sex;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 
     @OneToOne
     private Profile profile;

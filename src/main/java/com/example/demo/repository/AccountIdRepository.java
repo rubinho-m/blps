@@ -10,6 +10,4 @@ import java.util.Optional;
 @Repository
 public interface AccountIdRepository extends JpaRepository<AccountId, Long> {
     Optional<AccountId> findByLogin(String login);
-
-    List<AccountId> findAllByFrozen(boolean frozen);
 }

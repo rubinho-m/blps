@@ -30,8 +30,8 @@ public class NewsApiImpl implements NewsApi {
     }
 
     @Override
-    public ResponseEntity<List<NewsResponseDto>> getAll() {
-        return ResponseEntity.ok(newsService.getAll());
+    public ResponseEntity<List<NewsResponseDto>> getAll(int page, int pageSize) {
+        return ResponseEntity.ok(newsService.getAll(page, pageSize));
     }
 
     @Override

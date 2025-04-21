@@ -20,8 +20,8 @@ public class LanguageApiImpl implements LanguageApi {
     }
 
     @Override
-    public ResponseEntity<List<LanguageDto>> getAll() {
-        return ResponseEntity.ok(languageService.getAll());
+    public ResponseEntity<List<LanguageDto>> getAll(int page, int pageSize) {
+        return ResponseEntity.ok(languageService.getAll(page, pageSize));
     }
 
     @Override

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PORT=6128
+PORT=8080
 
 echo 'Зарегистрируем пользователя'
 RESPONSE=$(curl --location "http://localhost:${PORT}/register" \

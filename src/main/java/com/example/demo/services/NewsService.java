@@ -9,7 +9,7 @@ import java.util.List;
 public interface NewsService {
     NewsResponseDto get(Long id);
 
-    List<NewsResponseDto> getAll();
+    List<NewsResponseDto> getAll(int page, int pageSize);
 
     NewsResponseDto publish(NewsRequestDto newsRequestDto, Profile profile);
 

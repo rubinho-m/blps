@@ -3,12 +3,15 @@ package com.example.demo.services.impl;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.RegisterDto;
 import com.example.demo.dto.RegisteredAccountIdDto;
-import com.example.demo.jwt.UserAuthProvider;
+import com.example.demo.jwt.JwtService;
 import com.example.demo.mappers.AccountIdMapper;
 import com.example.demo.model.AccountId;
+import com.example.demo.model.Authority;
 import com.example.demo.model.Profile;
+import com.example.demo.model.UserXml;
 import com.example.demo.repository.AccountIdRepository;
 import com.example.demo.repository.ProfileRepository;
+import com.example.demo.repository.UserXmlRepository;
 import com.example.demo.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.CharBuffer;
+import java.util.List;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -24,19 +28,22 @@ public class AuthServiceImpl implements AuthService {
     private final ProfileRepository profileRepository;
     private final AccountIdMapper accountIdMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UserAuthProvider userAuthProvider;
+    private final JwtService jwtService;
+    private final UserXmlRepository userXmlRepository;
 
     @Autowired
     public AuthServiceImpl(AccountIdRepository accountIdRepository,
                            ProfileRepository profileRepository,
                            AccountIdMapper accountIdMapper,
                            PasswordEncoder passwordEncoder,
-                           UserAuthProvider userAuthProvider) {
+                           JwtService jwtService,
+                           UserXmlRepository userXmlRepository) {
         this.accountIdRepository = accountIdRepository;
         this.profileRepository = profileRepository;
         this.accountIdMapper = accountIdMapper;
         this.passwordEncoder = passwordEncoder;
-        this.userAuthProvider = userAuthProvider;
+        this.jwtService = jwtService;
+        this.userXmlRepository = userXmlRepository;
     }
 
     @Override
@@ -52,7 +59,12 @@ public class AuthServiceImpl implements AuthService {
         accountId.setFrozen(false);
         profileRepository.save(createdProfile);
         accountIdRepository.save(accountId);
-        return new RegisteredAccountIdDto(userAuthProvider.createToken(accountId.getLogin(), accountId.getRole()));
+        userXmlRepository.save(new UserXml(
+                accountId.getLogin(),
+                passwordEncoder.encode(registerDto.getPassword()),
+                List.of(Authority.BASE)
+        ));
+        return new RegisteredAccountIdDto(jwtService.createToken(accountId.getLogin()));
     }
 
     @Override
@@ -60,9 +72,10 @@ public class AuthServiceImpl implements AuthService {
         final AccountId accountId = accountIdRepository.findByLogin(loginDto.getLogin())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
-        if (passwordEncoder.matches(CharBuffer.wrap(loginDto.getPassword()), accountId.getPassword())) {
+        final UserXml userXml = userXmlRepository.findByLogin(accountId.getLogin());
+        if (passwordEncoder.matches(CharBuffer.wrap(loginDto.getPassword()), userXml.getHashedPassword())) {
             checkFrozen(accountId);
-            return new RegisteredAccountIdDto(userAuthProvider.createToken(accountId.getLogin(), accountId.getRole()));
+            return new RegisteredAccountIdDto(jwtService.createToken(accountId.getLogin()));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");

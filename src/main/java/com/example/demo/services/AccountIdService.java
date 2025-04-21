@@ -14,7 +14,7 @@ public interface AccountIdService {
 
     void requestChangeAccountId(String token, AccountIdChangeRequestDto accountIdChangeRequestDto);
 
-    List<AdminChangeRequestDto> getAllRequestedChanges();
+    List<AdminChangeRequestDto> getAllRequestedChanges(int page, int pageSize);
 
     void permitChangeRequest(Long id);
 

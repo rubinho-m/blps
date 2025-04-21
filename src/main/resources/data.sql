@@ -17,9 +17,9 @@ INSERT INTO profile_family (first_profile_id, second_profile_id)
 VALUES (1, 2),
        (2, 1);
 
-INSERT INTO account_ids (birth_date, login, name, password, role, sex, surname, profile_id, frozen)
-VALUES ('2004-07-09', 'admin', 'Михаил', '$2a$10$uezbzRQyCde.P6A8TU2ogef4zHEGL0kDpxpqBLFVJrXPVPQdep1Z2', 'ADMIN', 'MALE', 'Рубин', 1, false),
-       ('2000-01-01', 'test', 'TEST', 'test', 'USER', 'MALE', 'TEST', 2, false);
+INSERT INTO account_ids (birth_date, login, name, sex, surname, profile_id, frozen)
+VALUES ('2004-07-09', 'admin', 'Михаил', 'MALE', 'Рубин', 1, false),
+       ('2000-01-01', 'test', 'TEST', 'MALE', 'TEST', 2, false);
 
 INSERT INTO profile_known_languages (language_id, profile_id)
 VALUES (1, 1);

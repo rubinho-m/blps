@@ -34,14 +34,14 @@ public class SubscriptionApiImpl implements SubscriptionApi {
     }
 
     @Override
-    public ResponseEntity<List<SubscriptionResponseDto>> getAllAccountsSubscriptions(String token) {
+    public ResponseEntity<List<SubscriptionResponseDto>> getAllAccountsSubscriptions(String token, int page, int pageSize) {
         final AccountId accountId = accountIdService.getAccountIdByToken(token);
-        return ResponseEntity.ok(subscriptionService.getAllByAccountId(accountId));
+        return ResponseEntity.ok(subscriptionService.getAllByAccountId(accountId, page, pageSize));
     }
 
     @Override
-    public ResponseEntity<List<SubscriptionTypeDto>> getAllAvailableSubscriptions() {
-        return ResponseEntity.ok(subscriptionService.getAllAvailableSubscriptions());
+    public ResponseEntity<List<SubscriptionTypeDto>> getAllAvailableSubscriptions(int page, int pageSize) {
+        return ResponseEntity.ok(subscriptionService.getAllAvailableSubscriptions(page, pageSize));
     }
 
     @Override

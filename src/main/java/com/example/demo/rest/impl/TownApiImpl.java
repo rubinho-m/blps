@@ -20,8 +20,8 @@ public class TownApiImpl implements TownApi {
     }
 
     @Override
-    public ResponseEntity<List<TownDto>> getAll() {
-        return ResponseEntity.ok(townService.getAll());
+    public ResponseEntity<List<TownDto>> getAll(int page, int pageSize) {
+        return ResponseEntity.ok(townService.getAll(page, pageSize));
     }
 
     @Override

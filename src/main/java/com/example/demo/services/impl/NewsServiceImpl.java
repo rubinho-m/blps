@@ -11,6 +11,8 @@ import com.example.demo.repository.PhotoRepository;
 import com.example.demo.services.NewsService;
 import com.example.demo.services.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,8 +46,9 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public List<NewsResponseDto> getAll() {
-        return newsRepository.findAll()
+    public List<NewsResponseDto> getAll(int page, int pageSize) {
+        final Pageable pageable = PageRequest.of(page, pageSize);
+        return newsRepository.findAll(pageable)
                 .stream()
                 .map(newsMapper::toDto)
                 .toList();

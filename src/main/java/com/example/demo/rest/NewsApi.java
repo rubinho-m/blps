@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -20,7 +21,8 @@ public interface NewsApi {
     ResponseEntity<NewsResponseDto> get(@PathVariable("id") Long id);
 
     @GetMapping("/news")
-    ResponseEntity<List<NewsResponseDto>> getAll();
+    ResponseEntity<List<NewsResponseDto>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", defaultValue = "10") int pageSize);
 
     @PostMapping("/news")
     ResponseEntity<NewsResponseDto> publish(@RequestBody NewsRequestDto newsRequestDto,

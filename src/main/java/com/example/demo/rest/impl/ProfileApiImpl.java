@@ -31,8 +31,8 @@ public class ProfileApiImpl implements ProfileApi {
     }
 
     @Override
-    public ResponseEntity<List<ProfileResponseDto>> getAll() {
-        return ResponseEntity.ok(profileService.getAllProfiles());
+    public ResponseEntity<List<ProfileResponseDto>> getAll(int page, int pageSize) {
+        return ResponseEntity.ok(profileService.getAllProfiles(page, pageSize));
     }
 
     @Override

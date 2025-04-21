@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 @Tag(name = "Profile Api", description = "Профили")
 public interface ProfileApi {
     @GetMapping("/profiles")
-    ResponseEntity<List<ProfileResponseDto>> getAll();
+    ResponseEntity<List<ProfileResponseDto>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                    @RequestParam(value = "size", defaultValue = "10") int pageSize);
 
     @GetMapping("/profiles/{login}")
     ResponseEntity<ProfileResponseDto> getByLogin(@PathVariable("login") String login);
