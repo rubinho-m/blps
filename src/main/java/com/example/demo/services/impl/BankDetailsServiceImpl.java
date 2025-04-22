@@ -1,6 +1,6 @@
 package com.example.demo.services.impl;
 
-import com.example.demo.PaymentException;
+import com.example.demo.exceptions.PaymentException;
 import com.example.demo.dto.BankDetailsDto;
 import com.example.demo.mappers.BankDetailsMapper;
 import com.example.demo.model.AccountId;
@@ -51,7 +51,7 @@ public class BankDetailsServiceImpl implements BankDetailsService {
                 .peek(bankDetail -> {
                     bankDetail.setCardNumber("***");
                     bankDetail.setValidityPeriod("***");
-                    bankDetail.setValidityPeriod("***");
+                    bankDetail.setCvv("***");
                 })
                 .toList();
     }
