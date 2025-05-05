@@ -13,4 +13,6 @@ public class SubscriptionRequestDto {
     private Integer monthCount;
 
     private BankDetailsDto bankDetails;
+
+    private String email;
 }

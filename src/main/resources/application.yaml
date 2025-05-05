@@ -26,3 +26,8 @@ springdoc:
 logging:
   level:
     root: info
+kafka:
+  bootstrap-servers: localhost:9092
+  topic: blps
+stripe:
+  api: ${STRIPE_API_KEY}

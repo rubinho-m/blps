@@ -9,14 +9,17 @@ import com.example.demo.mappers.SubscriptionTypeMapper;
 import com.example.demo.model.AccountId;
 import com.example.demo.model.Authority;
 import com.example.demo.model.BankDetails;
+import com.example.demo.model.PaidSubscriptionEvent;
 import com.example.demo.model.Subscription;
 import com.example.demo.model.SubscriptionType;
 import com.example.demo.repository.SubscriptionRepository;
 import com.example.demo.repository.SubscriptionTypeRepository;
 import com.example.demo.repository.UserXmlRepository;
 import com.example.demo.services.BankDetailsService;
+import com.example.demo.services.KafkaProducerService;
 import com.example.demo.services.SubscriptionService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +43,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final BankDetailsService bankDetailsService;
     private final TransactionTemplate transactionTemplate;
     private final UserXmlRepository userXmlRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     @Autowired
     public SubscriptionServiceImpl(SubscriptionTypeRepository subscriptionTypeRepository,
@@ -48,13 +52,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                                    SubscriptionTypeMapper subscriptionTypeMapper,
                                    BankDetailsService bankDetailsService,
                                    PlatformTransactionManager transactionManager,
-                                   UserXmlRepository userXmlRepository) {
+                                   UserXmlRepository userXmlRepository,
+                                   KafkaProducerService kafkaProducerService) {
         this.subscriptionTypeRepository = subscriptionTypeRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionMapper = subscriptionMapper;
         this.subscriptionTypeMapper = subscriptionTypeMapper;
         this.bankDetailsService = bankDetailsService;
         this.userXmlRepository = userXmlRepository;
+        this.kafkaProducerService = kafkaProducerService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -144,13 +150,36 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return transactionTemplate.execute(status -> {
             try {
                 final Subscription subscription = subscriptionMapper.toEntity(subscriptionRequestDto, false);
+                final String userEmail = subscriptionRequestDto.getEmail();
+
                 subscription.setAccountId(accountId);
+
                 LOGGER.info("bankDetails: {}", bankDetailsService.findAllBankDetails(0, 10));
                 final BankDetails bankDetails = bankDetailsService.saveBankDetails(subscriptionRequestDto.getBankDetails());
                 LOGGER.info("bankDetails: {}", bankDetailsService.findAllBankDetails(0, 10));
+
                 subscription.setBankDetails(bankDetails);
+                subscription.setEmail(userEmail);
+
                 bankDetailsService.makePayment(accountId, bankDetails, subscription.getType().getPrice());
-                return subscriptionMapper.toDto(subscriptionRepository.save(subscription));
+
+                final SubscriptionResponseDto subscriptionResponseDto = subscriptionMapper.toDto(subscriptionRepository.save(subscription));
+
+                if (StringUtils.isNotBlank(userEmail)) {
+                    kafkaProducerService.sendEvent(
+                            new PaidSubscriptionEvent(
+                                    userEmail,
+                                    accountId.getLogin(),
+                                    subscriptionResponseDto.getSubscriptionType().getName(),
+                                    subscriptionResponseDto.getSubscriptionType().getPrice(),
+                                    subscriptionResponseDto.getStartDate(),
+                                    subscriptionResponseDto.getEndDate(),
+                                    subscriptionResponseDto.getNextPaymentDate()
+                            )
+                    );
+                }
+
+                return subscriptionResponseDto;
             } catch (Exception e) {
                 status.setRollbackOnly();
                 throw new RuntimeException(e.getMessage());

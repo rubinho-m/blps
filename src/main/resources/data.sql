@@ -7,6 +7,7 @@ VALUES ('Русский'),
 
 INSERT INTO subscription_types (price, description, name)
 VALUES (250, 'Подписка на музыку', 'Music'),
+       (900, 'Премиум подписка', 'Premium'),
        (0, 'Подписка на знакомства', 'Dating');
 
 INSERT INTO profiles (login, home_town_id, marital_status, short_description, frozen)

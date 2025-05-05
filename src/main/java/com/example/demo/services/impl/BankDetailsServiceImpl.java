@@ -1,7 +1,7 @@
 package com.example.demo.services.impl;
 
-import com.example.demo.exceptions.PaymentException;
 import com.example.demo.dto.BankDetailsDto;
+import com.example.demo.exceptions.PaymentException;
 import com.example.demo.mappers.BankDetailsMapper;
 import com.example.demo.model.AccountId;
 import com.example.demo.model.BankDetails;
@@ -9,10 +9,7 @@ import com.example.demo.model.Payments;
 import com.example.demo.repository.BankDetailsRepository;
 import com.example.demo.repository.PaymentsRepository;
 import com.example.demo.services.BankDetailsService;
-import com.stripe.Stripe;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
-import jakarta.annotation.PostConstruct;
+import com.example.demo.services.StripeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -27,19 +24,17 @@ public class BankDetailsServiceImpl implements BankDetailsService {
     private final BankDetailsRepository bankDetailsRepository;
     private final BankDetailsMapper bankDetailsMapper;
     private final PaymentsRepository paymentsRepository;
+    private final StripeService stripeService;
 
     @Autowired
     public BankDetailsServiceImpl(BankDetailsRepository bankDetailsRepository,
                                   BankDetailsMapper bankDetailsMapper,
-                                  PaymentsRepository paymentsRepository) {
+                                  PaymentsRepository paymentsRepository,
+                                  StripeService stripeService) {
         this.bankDetailsRepository = bankDetailsRepository;
         this.bankDetailsMapper = bankDetailsMapper;
         this.paymentsRepository = paymentsRepository;
-    }
-
-    @PostConstruct
-    protected void init() {
-        Stripe.apiKey = System.getenv("STRIPE_API_KEY");
+        this.stripeService = stripeService;
     }
 
     @Override
@@ -64,6 +59,7 @@ public class BankDetailsServiceImpl implements BankDetailsService {
     @Override
     public void makePayment(AccountId accountId, BankDetails bankDetails, int amount) {
         final boolean shouldBeSuccess = !"BAD".equals(bankDetails.getBankAccountName());
+
         paymentsRepository.save(
                 Payments.builder()
                         .accountId(accountId)
@@ -71,27 +67,13 @@ public class BankDetailsServiceImpl implements BankDetailsService {
                         .amount(amount)
                         .build()
         );
-        processPayment(amount, shouldBeSuccess);
-    }
 
-    private void processPayment(int amount, boolean shouldBeSuccess) {
-        final PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount((long) amount)
-                .setCurrency("usd")
-                .setPaymentMethod(shouldBeSuccess ? "pm_card_visa" : "pm_card_chargeDeclined")
-                .setAutomaticPaymentMethods(
-                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                .setEnabled(true)
-                                .setAllowRedirects(
-                                        PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER
-                                )
-                                .build()
-                )
-                .setConfirm(true)
-                .build();
         try {
-            final PaymentIntent paymentIntent = PaymentIntent.create(params);
-            LOGGER.info("Успешное списание! ID: {}", paymentIntent.getId());
+            if (shouldBeSuccess) {
+                stripeService.makePayment(amount);
+            } else {
+                stripeService.makeErrorPayment(amount);
+            }
         } catch (Exception e) {
             throw new PaymentException("Произошла ошибка при списании средств");
         }

@@ -48,4 +48,7 @@ public class Subscription {
     @JoinColumn
     @ManyToOne
     private AccountId accountId;
+
+    @Column
+    private String email;
 }
